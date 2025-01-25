@@ -5,83 +5,228 @@ https://www.flaticon.com/free-icon/dashboard_9055107?term=dashboard&page=1&posit
 */
 
 import java.awt.*;    
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
+import java.io.IOException;
 import javax.swing.*;
 
+/*
+
+decode("#00bf63")
+
+*/
+
 public class Dashboard {
-    // Function that returns the custom JPanel
-    private static JPanel createHoverPanel() {
-        JPanel panel = new JPanel() {
-            // Set rounded corners using RoundRectangle2D
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                Graphics2D g2d = (Graphics2D) g;
-                g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+    // Function that returns the custom JPanel   
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize) {
+        JPanel panel = new JPanel(new BorderLayout());
 
-                // Create rounded rectangle with desired corner radius
-                RoundRectangle2D roundedRectangle = new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 30, 30);
-                g2d.setColor(getBackground()); // Set the background color for the panel
-                g2d.fill(roundedRectangle); // Fill the rounded rectangle
+        // Create the label with the given text
+        JLabel label = new JLabel(labelText, SwingConstants.CENTER);
+
+        // Try to apply color based on the value of labelText
+        try {
+            double i = Integer.parseInt(labelText); // Try to parse the string as an integer
+            if (i > 0) {
+                label.setForeground(Color.decode("#00bf63"));
+            } else if (i < 0) {
+                label.setForeground(Color.red);
+            } else {
+                label.setForeground(Color.black);
             }
-        };
+        } catch (NumberFormatException e) {
+            System.out.println("dashboard button text not a number!");
+        }
 
-        panel.setLayout(null);
-        
-        // Set the initial color
-        panel.setBackground(Main.colorSelectedButton);
+        // Set the initial font size
+        label.setFont(new Font("Arial", Font.BOLD, initialFontSize));
 
-        // Set the panel to non-opaque so that the custom painting is visible
-        panel.setOpaque(false);
+        // Add the label to the center of the panel
+        panel.add(label, BorderLayout.CENTER);
 
-        // Add mouse listener for hover effect
-        panel.addMouseListener(new MouseAdapter() {
+        // Add a component listener to adjust the font size when the panel is resized
+        panel.addComponentListener(new ComponentAdapter() {
             @Override
-            public void mouseEntered(MouseEvent e) {
-                panel.setBackground(Color.decode("#d1bc95")); // Change color when hovered
-            }
+            public void componentResized(ComponentEvent e) {
+                // Get the current size of the panel
+                int panelWidth = panel.getWidth();
+                int panelHeight = panel.getHeight();
 
-            @Override
-            public void mouseExited(MouseEvent e) {
-                panel.setBackground(Main.colorSelectedButton); // Reset color when not hovered
-            }
+                // Get the width of the text using the label's font and the text
+                FontMetrics fontMetrics = label.getFontMetrics(label.getFont());
+                int textWidth = fontMetrics.stringWidth(label.getText());
+                int textHeight = fontMetrics.getHeight();
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // Show a message dialog when clicked
-                JOptionPane.showMessageDialog(panel, "Panel clicked!", "Message", JOptionPane.INFORMATION_MESSAGE);
+                // Use the initial font size if the text fits within the panel
+                int scaledFontSize = initialFontSize;
+
+                // If the text is wider than the panel, reduce the font size
+                while (textWidth > panelWidth && scaledFontSize > 10) {
+                    scaledFontSize--; // Decrease the font size gradually
+                    label.setFont(new Font("Arial", Font.BOLD, scaledFontSize)); // Update the font size
+                    fontMetrics = label.getFontMetrics(label.getFont()); // Recalculate font metrics
+                    textWidth = fontMetrics.stringWidth(label.getText()); // Recalculate the text width with the new font size
+                }
+
+                // If the text height is larger than the panel's height, adjust the font size further
+                while (textHeight > panelHeight && scaledFontSize > 10) {
+                    scaledFontSize--; // Decrease the font size gradually
+                    label.setFont(new Font("Arial", Font.BOLD, scaledFontSize)); // Update the font size
+                    fontMetrics = label.getFontMetrics(label.getFont()); // Recalculate font metrics
+                    textHeight = fontMetrics.getHeight(); // Recalculate text height
+                }
+
+                // Ensure the font size doesn't go below a reasonable value
+                scaledFontSize = Math.max(scaledFontSize, 10); // Min font size limit
+
+                // Set the new font size for the label
+                label.setFont(new Font("Arial", Font.BOLD, scaledFontSize));
             }
         });
 
+        panel.setOpaque(false);
+
         return panel;
     }
+    public static JPanel createScaleTextPanel(String labelText){
+        return createScaleTextPanel(labelText, 20);
+    }
+    public static JPanel createNumberPanel(String labelText){
+        return createScaleTextPanel(labelText, 50);
+    }
+    
+    public static String valSystemUsers = new String();    
+    public static String valProducts = new String();
+    public static String valSuppliers = new String();
+    public static String valTotalSales = new String();
+    public static String valStocks = new String();
     
     private static final JPanel pnlDashboard = new JPanel();
-    public static JPanel pnlDashboard(){
+    public static JPanel pnlDashboard() throws IOException{
+        valSystemUsers="50";
+        valProducts="51";
+        valSuppliers="52";
+        valTotalSales="53";
+        valStocks="54";
+        
         pnlDashboard.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
         pnlDashboard.setLayout(null);
         pnlDashboard.setBackground(Color.white);
         
-        JPanel panel1 = createHoverPanel();
+        String path;
+        
+        // icon used: <a href="https://www.flaticon.com/free-icons/user-management" title="user management icons">User management icons created by Vectorslab - Flaticon</a>
+        JPanel panel1 = Main.createHoverPanel();
         panel1.setBounds(60, 30, 200, 100);
+        path = "src/icons/user-management.png";
+        JLabel logo1 = Main.createImage(path);
+        logo1.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
+        panel1.add(logo1);
+        JPanel pnlNum1 = createNumberPanel(valSystemUsers);
+        pnlNum1.setBounds(94, 5, 100, 50);
+        panel1.add(pnlNum1);
+        JPanel pnlLabel1 = createScaleTextPanel("SYSTEM USERS");
+        pnlLabel1.setBounds(94, 55, 100, 20);
+        panel1.add(pnlLabel1);        
+        // Add mouse listener for hover effect
+        panel1.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Show a message dialog when clicked
+                JOptionPane.showMessageDialog(panel1, "Panel1 clicked!", "Message", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
         pnlDashboard.add(panel1);
         
-        JPanel panel2 = createHoverPanel();
+        JPanel panel2 = Main.createHoverPanel();
         panel2.setBounds(290, 30, 200, 100);
+        path = "src/icons/product1.png";
+        JLabel logo2 = Main.createImage(path);
+        logo2.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
+        panel2.add(logo2);
+        JPanel pnlNum2 = createNumberPanel(valProducts);
+        pnlNum2.setBounds(94, 5, 100, 50);
+        panel2.add(pnlNum2);
+        JPanel pnlLabel2 = createScaleTextPanel("PRODUCTS");
+        pnlLabel2.setBounds(94, 55, 100, 20);
+        panel2.add(pnlLabel2);   
+        // Add mouse listener for hover effect
+        panel2.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Show a message dialog when clicked
+                Main.triggerPanelClick(Main.panel2);
+            }
+        });
         pnlDashboard.add(panel2);
         
-        JPanel panel3 = createHoverPanel();
+        JPanel panel3 = Main.createHoverPanel();
         panel3.setBounds(520, 30, 200, 100);
+        path = "src/icons/supplier1.png";
+        JLabel logo3 = Main.createImage(path);
+        logo3.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
+        panel3.add(logo3);
+        JPanel pnlNum3 = createNumberPanel(valSuppliers);
+        pnlNum3.setBounds(94, 5, 100, 50);
+        panel3.add(pnlNum3);
+        JPanel pnlLabel3 = createScaleTextPanel("SUPPLIERS");
+        pnlLabel3.setBounds(94, 55, 100, 20);
+        panel3.add(pnlLabel3);
+        // Add mouse listener for hover effect
+        panel3.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Show a message dialog when clicked
+                Main.triggerPanelClick(Main.panel3);
+            }
+        });
         pnlDashboard.add(panel3);
         
-        JPanel panel4 = createHoverPanel();
+        JPanel panel4 = Main.createHoverPanel();
         panel4.setBounds(750, 30, 200, 100);
+        path = "src/icons/sales1.png";
+        JLabel logo4 = Main.createImage(path);
+        logo4.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
+        panel4.add(logo4);
+        JPanel pnlNum4 = createNumberPanel(valTotalSales);
+        pnlNum4.setBounds(94, 5, 100, 50);
+        panel4.add(pnlNum4);
+        JPanel pnlLabel4 = createScaleTextPanel("TOTAL SALES");
+        pnlLabel4.setBounds(94, 55, 100, 20);
+        panel4.add(pnlLabel4);
+        // Add mouse listener for hover effect
+        panel4.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Show a message dialog when clicked
+                Main.triggerPanelClick(Main.panel4);
+            }
+        });
         pnlDashboard.add(panel4);
         
-        JPanel panel5 = createHoverPanel();
+        JPanel panel5 = Main.createHoverPanel();
         panel5.setBounds(980, 30, 200, 100);
+        path = "src/icons/warehouse1.png";
+        JLabel logo5 = Main.createImage(path);
+        logo5.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
+        panel5.add(logo5);
+        JPanel pnlNum5 = createNumberPanel(valStocks);
+        pnlNum5.setBounds(94, 5, 100, 50);
+        panel5.add(pnlNum5);
+        JPanel pnlLabel5 = createScaleTextPanel("STOCKS");
+        pnlLabel5.setBounds(94, 55, 100, 20);
+        panel5.add(pnlLabel5);
+        // Add mouse listener for hover effect
+        panel5.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Show a message dialog when clicked
+                Main.triggerPanelClick(Main.panel5);
+            }
+        });
         pnlDashboard.add(panel5);
         
         return pnlDashboard;
