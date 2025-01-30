@@ -25,6 +25,7 @@ public class Main {
     public static Color colorPanelBG = Color.decode("#6f9276");
     public static Color colorSelectedButton = Color.decode("#fee4b6");
     public static String stringcolorSelectedButton = "#fee4b6";
+    public static String stringthegreencolor = "#179c53";
     
     public static JPanel pnlMain = new JPanel();
     public static int pnlMainWidth = 1243;
@@ -75,9 +76,41 @@ public class Main {
         }
     }
     public static JPanel pnlProducts = Products.pnlProducts();
-    public static JPanel pnlSuppliers = Suppliers.pnlSuppliers();
+    public static JPanel pnlSuppliers;
+    static {
+        try {
+            pnlSuppliers = Suppliers.pnlSuppliers();
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception (e.g., log it or display a message)
+            pnlSuppliers = new JPanel(); // Default to an empty panel to avoid null issues
+        }
+    };
     public static JPanel pnlTotalSales = TotalSales.pnlTotalSales();
-    public static JPanel pnlStocks = Stocks.pnlStocks();
+    public static JPanel pnlStocks;
+    static {
+        try {
+            pnlStocks = Stocks.pnlStocks();
+        } catch (IOException e) {
+            e.printStackTrace(); // Handle the exception (e.g., log it or display a message)
+            pnlStocks = new JPanel(); // Default to an empty panel to avoid null issues
+        }
+    };
+    
+    public static void refresh(JPanel panel){
+        pnlDashboard.revalidate();
+        pnlDashboard.repaint();
+        pnlProducts.revalidate();
+        pnlProducts.repaint();
+        pnlSuppliers.revalidate();
+        pnlSuppliers.repaint();
+        pnlTotalSales.revalidate();
+        pnlTotalSales.repaint();
+        pnlStocks.revalidate();
+        pnlStocks.repaint();
+        
+        openPanelInPanelMain(panel);
+        System.out.println("Refreshed.");
+    }
     
     // A static variable to track the currently selected panel (the one with the border)
     // here
@@ -234,55 +267,110 @@ public class Main {
     public static JPanel createRoundedPanel(int radius){
         return createRoundedPanel(radius, "#FF0000");
     }
+    public static JPanel createWhitePanel(){
+        JPanel panel = new JPanel();
+        panel.setBackground(Color.white);
+        return panel;
+    }
+    public static JPanel createAddPanel(String borderColor, int width, int height) {
+    JPanel panel = new JPanel() {
+        // Custom painting for rounded corners and dashed border
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g;
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Create a rounded rectangle with 30-pixel corner radius
+            RoundRectangle2D roundedRectangle = new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 30, 30);
+
+            // Set the color for the dashed border
+            g2d.setColor(Color.decode(borderColor));
+            g2d.setStroke(new BasicStroke(3, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0, new float[]{10}, 0));
+            g2d.draw(roundedRectangle); // Draw the dashed border
+        }
+    };
+
+    // Set the panel's layout manager
+    panel.setLayout(new GridBagLayout()); // Use GridBagLayout for centering
+    panel.setPreferredSize(new Dimension(width, height));
+    panel.setOpaque(false); // Make it transparent so the custom painting is visible
+
+    // Create the label with the "+" symbol
+    JLabel label = new JLabel("+");
+    label.setFont(new Font("Arial", Font.PLAIN, 48)); // Set font size and style
+    label.setForeground(Color.decode("#000")); // Set the color of the "+" symbol
+
+    // Add the label to the panel
+    panel.add(label);
+
+    return panel;
+}
+
+    public static JPanel createProductCard(){
+        JPanel panel = new JPanel();
+        
+        return panel;
+    }
     
-    public static JPanel createHoverPanel(String stringcolorDefault, String stringcolorHover) {
+    // Function to create a hover panel with custom size and colors
+    public static JPanel createHoverPanel(String colorDefault, String colorHover, int width, int height, String s, String textcolor) {
         JPanel panel = new JPanel() {
-            // Set rounded corners using RoundRectangle2D
+            // Custom painting for rounded corners
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 Graphics2D g2d = (Graphics2D) g;
                 g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Create rounded rectangle with desired corner radius
+                // Create a rounded rectangle with 30-pixel corner radius
                 RoundRectangle2D roundedRectangle = new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 30, 30);
-                g2d.setColor(getBackground()); // Set the background color for the panel
-                g2d.fill(roundedRectangle); // Fill the rounded rectangle
+                g2d.setColor(getBackground()); // Use the panel's background color
+                g2d.fill(roundedRectangle); // Fill the shape
             }
         };
 
         panel.setLayout(null);
-        
-        // Set the initial color
-        panel.setBackground(Color.decode(stringcolorDefault));
 
-        // Set the panel to non-opaque so that the custom painting is visible
+        // Set the initial size
+        panel.setPreferredSize(new Dimension(width, height));
+//        panel.setSize(width, height);
+        
+
+        // Set the initial background color
+        panel.setBackground(Color.decode(colorDefault));
+
+        // Set the panel to non-opaque so custom painting is visible
         panel.setOpaque(false);
 
-        // Add mouse listener for hover effect
+        // Add mouse listeners for hover effect
         panel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                panel.setBackground(Color.decode(stringcolorHover)); // Change color when hovered
+                panel.setBackground(Color.decode(colorHover)); // Change color on hover
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
-                panel.setBackground(Color.decode(stringcolorDefault)); // Reset color when not hovered
+                panel.setBackground(Color.decode(colorDefault)); // Reset color on exit
             }
-            /*
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                // Show a message dialog when clicked
-                JOptionPane.showMessageDialog(panel, "Panel clicked!", "Message", JOptionPane.INFORMATION_MESSAGE);
-            }
-            */
         });
+        
+        JPanel word = Dashboard.createScaleTextPanel(s, 20, textcolor);
+        word.setBounds(0, 0, width, height);
+        panel.add(word);
 
         return panel;
-    } 
-    public static JPanel createHoverPanel(){
-        return createHoverPanel(stringcolorSelectedButton,"#d1bc95");
+    }
+    public static JPanel createHoverPanel(String colorDefault, String colorHover, int width, int height, String s) {
+        return createHoverPanel(colorDefault, colorHover, width, height, s, "#000000");
+    }
+    // Overloaded method with default hover colors and size
+    public static JPanel createHoverPanel() {
+        return createHoverPanel(stringcolorSelectedButton, "#d1bc95", 200, 100, ""); // Default colors and size
+    }
+    public static JPanel createHoverPanel(String colorDefault, String colorHover, int width, int height){
+        return createHoverPanel(colorDefault, colorHover, width, height, ""); // Default colors and size
     }
     
     // Method to create a panel with flex-like layout (horizontal layout) with margin and padding
@@ -303,15 +391,10 @@ public class Main {
 
         return panel;
     }
-    public static JPanel createFlexPanel(int margin, int padding){
-        return createFlexPanel(margin,margin,margin,margin,padding,padding,padding,padding);
+    public static JPanel createFlexPanel(int margin, int paddingx, int paddingy){
+        return createFlexPanel(margin,margin,margin,margin,paddingx,paddingy,paddingx,paddingy);
     }
-    
-    private static JPanel createWhitePanel(){
-        JPanel panel = new JPanel();
-        panel.setBackground(Color.white);
-        return panel;
-    }
+
     
     public static JPanel panel1 = new JPanel();
     public static JPanel panel2 = new JPanel();

@@ -20,13 +20,37 @@ decode("#00bf63")
 */
 
 public class Dashboard {
+    
+    public static JPanel createTextPanel(String labelText, int size, String color, int style) {        
+        JPanel panel = new JPanel(new BorderLayout()); // Use BorderLayout for full width
+        panel.setPreferredSize(new Dimension(200, 100)); // Set panel size
+
+        // Create the label and set text wrapping behavior
+        JLabel label = new JLabel("<html><body style='width: 100%; word-wrap: break-word;'>" + labelText + "</body></html>");
+        label.setForeground(Color.decode(color));
+        label.setFont(new Font("Arial", style, size));
+
+        // Align text to top-left
+        label.setHorizontalAlignment(SwingConstants.LEFT);
+        label.setVerticalAlignment(SwingConstants.TOP);
+
+        // Add to panel
+        panel.setOpaque(false);
+        panel.add(label, BorderLayout.NORTH);
+
+        return panel;
+    }
+
+
+
     // Function that returns the custom JPanel   
-    public static JPanel createScaleTextPanel(String labelText, int initialFontSize) {
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color, int style, int horizontalalign) {
         JPanel panel = new JPanel(new BorderLayout());
 
         // Create the label with the given text
-        JLabel label = new JLabel(labelText, SwingConstants.CENTER);
-
+        JLabel label = new JLabel(labelText, horizontalalign);
+        label.setForeground(Color.decode(color));
+        
         // Try to apply color based on the value of labelText
         try {
             double i = Integer.parseInt(labelText); // Try to parse the string as an integer
@@ -35,17 +59,19 @@ public class Dashboard {
             } else if (i < 0) {
                 label.setForeground(Color.red);
             } else {
-                label.setForeground(Color.black);
+                label.setForeground(Color.decode(color));
             }
         } catch (NumberFormatException e) {
-            System.out.println("dashboard button text not a number!");
+//            System.out.println("dashboard button text not a number!");
         }
 
         // Set the initial font size
-        label.setFont(new Font("Arial", Font.BOLD, initialFontSize));
+        label.setFont(new Font("Arial", style, initialFontSize));
 
         // Add the label to the center of the panel
         panel.add(label, BorderLayout.CENTER);
+        
+        panel.setOpaque(false);
 
         // Add a component listener to adjust the font size when the panel is resized
         panel.addComponentListener(new ComponentAdapter() {
@@ -66,7 +92,7 @@ public class Dashboard {
                 // If the text is wider than the panel, reduce the font size
                 while (textWidth > panelWidth && scaledFontSize > 10) {
                     scaledFontSize--; // Decrease the font size gradually
-                    label.setFont(new Font("Arial", Font.BOLD, scaledFontSize)); // Update the font size
+                    label.setFont(new Font("Arial", style, scaledFontSize)); // Update the font size
                     fontMetrics = label.getFontMetrics(label.getFont()); // Recalculate font metrics
                     textWidth = fontMetrics.stringWidth(label.getText()); // Recalculate the text width with the new font size
                 }
@@ -74,7 +100,7 @@ public class Dashboard {
                 // If the text height is larger than the panel's height, adjust the font size further
                 while (textHeight > panelHeight && scaledFontSize > 10) {
                     scaledFontSize--; // Decrease the font size gradually
-                    label.setFont(new Font("Arial", Font.BOLD, scaledFontSize)); // Update the font size
+                    label.setFont(new Font("Arial", style, scaledFontSize)); // Update the font size
                     fontMetrics = label.getFontMetrics(label.getFont()); // Recalculate font metrics
                     textHeight = fontMetrics.getHeight(); // Recalculate text height
                 }
@@ -83,16 +109,24 @@ public class Dashboard {
                 scaledFontSize = Math.max(scaledFontSize, 10); // Min font size limit
 
                 // Set the new font size for the label
-                label.setFont(new Font("Arial", Font.BOLD, scaledFontSize));
+                label.setFont(new Font("Arial", style, scaledFontSize));
             }
         });
 
-        panel.setOpaque(false);
 
         return panel;
     }
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color, int style){
+        return createScaleTextPanel(labelText, initialFontSize, color, style, SwingConstants.CENTER);
+    }
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color){
+        return createScaleTextPanel(labelText, initialFontSize, color, Font.BOLD);
+    }
     public static JPanel createScaleTextPanel(String labelText){
         return createScaleTextPanel(labelText, 20);
+    }
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize){
+        return createScaleTextPanel(labelText, initialFontSize, "#000000");
     }
     public static JPanel createNumberPanel(String labelText){
         return createScaleTextPanel(labelText, 50);
