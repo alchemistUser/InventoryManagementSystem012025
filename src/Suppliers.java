@@ -1,14 +1,9 @@
-
-/*
-icon used:
-https://www.flaticon.com/free-icon/supplier_18255220?term=supplier&page=1&position=21&origin=search&related_id=18255220
-*/
-
-import java.awt.*;    
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
+import java.sql.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.*;
 
 public class Suppliers {
@@ -16,188 +11,157 @@ public class Suppliers {
     private static JPanel panel1 = new JPanel();
     static int suppwidth = 200;
     static int suppheight = 225;
-    private static JPanel pnlAddSupplier = Main.createAddPanel("#0000", suppwidth,suppheight);    
-    
-    static void addTheSuppliers(){
+    private static JPanel pnlAddSupplier = Main.createAddPanel("#0000", suppwidth, suppheight);
+    private static JCheckBox showUnavailableCheckbox = new JCheckBox("Show Unavailable");
+
+    public static void addTheSuppliers() {
         panel1.removeAll();
         panel1.revalidate();
         panel1.repaint();
+
+        boolean showUnavailable = showUnavailableCheckbox.isSelected();
+        String query = "SELECT supplier_id, supplier_name, supplier_company_name, contact_no, email, status FROM suppliers";
+        if (!showUnavailable) {
+            query += " WHERE status = 1"; // Only show active suppliers
+        }
         
-        panel1.add(createSupplier());
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/imsadmin_imsfd", "root", "");
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(query)) {
+
+            while (rs.next()) {
+                String supplierId = rs.getString("supplier_id");
+                String name = rs.getString("supplier_name");
+                String company = rs.getString("supplier_company_name");
+                String contact = rs.getString("contact_no");
+                String email = rs.getString("email");
+                boolean status = rs.getBoolean("status");
+
+                panel1.add(createSupplier(supplierId, name, company, contact, email, status));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        panel1.add(pnlAddSupplier);
     }
-    
-    static void addSupplier(String name, String company, String location, String contactno, String email){
-        panel1.add(createSupplier(name, company, location, contactno, email));
-        panel1.add(pnlAddSupplier);        
-                   
-        Main.refresh(Main.pnlSuppliers);
-    }
-    static void addSupplier(){
-        addSupplier("","","","","");
-    }
-    
-    static JPanel createSupplier(String name, String company, String location, String contactno, String email){
-        JPanel panel = Main.createHoverPanel(Main.stringcolorPanelBG, "#94C3A0", suppwidth, suppheight);
-        panel.setLayout(null);        
-        
-        int width = suppwidth-10;
+
+    static JPanel createSupplier(String supplierId, String name, String company, String contactno, String email, boolean status) {
+        JPanel panel = Main.createGradientHoverPanel(
+            "#1b9d54", "#cfca93", 
+            "#76c498", "#e2dfbe", 
+            suppwidth, suppheight
+        );
+        panel.setLayout(null);
+
+        int width = suppwidth - 10;
         int ninety = 75;
-        
+
         JPanel pnlName = Dashboard.createScaleTextPanel(name, 40, "#ffffff", Font.BOLD);
-        pnlName.setBounds(10, ninety-60, width, 50);
-//        pnlName.setOpaque(true);
-//        pnlName.setBackground(Color.red);
+        pnlName.setBounds(10, ninety - 60, width, 50);
         panel.add(pnlName);
-        
+
         JPanel line = Main.createWhitePanel();
-        line.setBounds(10, ninety-5, width, 1);
+        line.setBounds(10, ninety - 5, width, 1);
         panel.add(line);
-        
-        String s = company;
-        int size = 20;
-        JPanel pnlCompany = Dashboard.createScaleTextPanel(s, size, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
-        pnlCompany.setBounds(10, ninety, width, size);
+
+        JPanel pnlCompany = Dashboard.createScaleTextPanel(company, 20, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
+        pnlCompany.setBounds(10, ninety, width, 20);
         panel.add(pnlCompany);
-        
-        s = "Location: "+location;
-        JPanel pnlLocation = Dashboard.createScaleTextPanel(s, size, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
-        pnlLocation.setBounds(10, ninety+size, width, size);
-        panel.add(pnlLocation);
-        
-        s = "Contact No.: "+contactno;
-        JPanel pnlContactno = Dashboard.createScaleTextPanel(s, size, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
-        pnlContactno.setBounds(10, ninety+size*2, width, size);
+
+        JPanel pnlContactno = Dashboard.createScaleTextPanel("Contact No.: " + contactno, 20, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
+        pnlContactno.setBounds(10, ninety + 20, width, 20);
         panel.add(pnlContactno);
-        
-        s = "Email: "+email;
-        JPanel pnlEmail = Dashboard.createScaleTextPanel(s, size, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
-        pnlEmail.setBounds(10, ninety+size*3, width, size);
+
+        JPanel pnlEmail = Dashboard.createScaleTextPanel("Email: " + email, 20, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
+        pnlEmail.setBounds(10, ninety + 40, width, 20);
         panel.add(pnlEmail);
-        
+
+        String statusText = status ? "Active" : "Inactive";
+        JPanel pnlStatus = Dashboard.createScaleTextPanel("Status: " + statusText, 20, "#ffffff", Font.PLAIN, SwingConstants.LEFT);
+        pnlStatus.setBounds(10, ninety + 60, width, 20);
+        panel.add(pnlStatus);
+
+        JLabel idLabel = new JLabel(supplierId);
+        idLabel.setVisible(false);
+        panel.add(idLabel);
+
+        panel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String id = idLabel.getText();
+                AddSupplierApp.showEditSupplierDialog(id, name, company, contactno, email, status);
+            }
+        });
+
         return panel;
     }
-    static JPanel createSupplier(){
-        return Suppliers.createSupplier("","","","","");
-    }
     
-    public static JPanel pnlSuppliers() throws IOException{
+    public static JPanel pnlSuppliers() {
         pnlSuppliers.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
         pnlSuppliers.setLayout(null);
         pnlSuppliers.setBackground(Color.white);
-                
-        // Create the first panel
+
         int width = Main.pnlMainWidth - 140;
         int height = 110;
         JPanel panel = Main.createRoundedPanel(45, Main.stringcolorSelectedButton);
         panel.setBounds(70, 30, width, height);
         panel.setLayout(null);
-        
+
         JTextField tfSearchBar = new JTextField();
-        tfSearchBar.setBounds(width-80-500, 30, 500, 50);
-        // Create a new Font with the desired style and size
-        Font newFont = new Font("Arial", Font.PLAIN, 18); // Font name, style, and size
-        // Set the font of the text field
-        tfSearchBar.setFont(newFont);
-        panel.add(tfSearchBar);        
-        
-        // icon used: https://www.flaticon.com/free-icon/magnifying-glass_151773?term=search&page=1&position=4&origin=search&related_id=151773
+        tfSearchBar.setBounds(width - 580, 30, 500, 50);
+        tfSearchBar.setFont(new Font("Arial", Font.PLAIN, 18));
+        panel.add(tfSearchBar);
+
         JButton btnSearch = new JButton();
-        btnSearch.setBounds(width-80, 30, 50, 50);
+        btnSearch.setBounds(width - 80, 30, 50, 50);
+        btnSearch.setFocusable(false);
         btnSearch.setIcon(new ImageIcon("src/icons/search.png"));
-        btnSearch.addActionListener(e -> {
-            // Action when the button is clicked
-            System.out.println("Button clicked!");
-        });
         panel.add(btnSearch);
-        
-        String logopath = "src/icons/suppliergreen.png";
-        double scaler = 1;
-        JLabel logo = Main.createImage(logopath, scaler);
+
+        JLabel logo = new JLabel();
+        try {
+            logo = Main.createImage("src/icons/suppliergreen.png", 1);
+        } catch (IOException ex) {
+            Logger.getLogger(Suppliers.class.getName()).log(Level.SEVERE, null, ex);
+        }
         logo.setBounds(30, 7, 100, 100);
         panel.add(logo);
-        
+
         JPanel pnlTitle = Dashboard.createScaleTextPanel("SUPPLIERS", 50, Main.stringthegreencolor, Font.BOLD);
         pnlTitle.setBounds(130, 7, 300, 100);
-//        pnlTitle.setOpaque(true);
-//        pnlTitle.setBackground(Color.red);
         panel.add(pnlTitle);
-        
-        
+
+        showUnavailableCheckbox.setBounds(70, 140, 200, 20);
+        showUnavailableCheckbox.setBackground(Color.white);
+        showUnavailableCheckbox.setFocusable(false);
+        showUnavailableCheckbox.addActionListener(e -> addTheSuppliers());
+        pnlSuppliers.add(showUnavailableCheckbox);
+
         pnlSuppliers.add(panel);
-        
-        
-        
-// Create the second panel (panel1)
+
         panel1.setBounds(70, 160, Main.pnlMainWidth - 140, Main.pnlMainHeight - 180);
-//        panel1.setBackground(Color.red);
         panel1.setBackground(Color.white);
+        panel1.setLayout(new GridLayout(0, 5, 10, 10));
 
-        // Set FlowLayout to allow dynamic resizing and add margin
-        GridLayout gridLayout = new GridLayout(0, 5, 10, 10); // 10px horizontal and vertical margin
-        panel1.setLayout(gridLayout);
-        
-        // Create a JScrollPane and set panel1 as the content
         JScrollPane scrollPane1 = new JScrollPane(panel1, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane1.setBounds(70, 160, Main.pnlMainWidth - 140, Main.pnlMainHeight - 180); // Set bounds for scrollPane1
+        scrollPane1.setBounds(70, 160, Main.pnlMainWidth - 140, Main.pnlMainHeight - 180);
         scrollPane1.setBorder(null);
+        scrollPane1.getVerticalScrollBar().setPreferredSize(new Dimension(10, 10));
 
-        // Make the vertical scrollbar with the same style as scrollPane
-        JScrollBar verticalScrollBar1 = scrollPane1.getVerticalScrollBar();
-        verticalScrollBar1.setPreferredSize(new Dimension(10, 10)); // Remove vertical scrollbar
-
-        // Make all parts of the horizontal scrollbar (track, arrows) completely transparent except the thumb
-        JScrollBar horizontalScrollBar1 = scrollPane1.getHorizontalScrollBar();
-        horizontalScrollBar1.setOpaque(false);
-        horizontalScrollBar1.setPreferredSize(new Dimension(0, 0)); // Adjust height of the scrollbar
-
-        // Set thumb to default and hide other parts of the scrollbar
-        verticalScrollBar1.setUI(new javax.swing.plaf.basic.BasicScrollBarUI() {
-            @Override
-            protected void configureScrollBarColors() {
-                super.configureScrollBarColors();
-                // Make sure only the thumb is visible and everything else is invisible
-                this.thumbColor = new Color(192, 192, 192); // Light grey thumb color
-                this.trackColor = new Color(0, 0, 0, 0);  // Transparent track
-                this.thumbHighlightColor = new Color(0, 0, 0, 0);  // Transparent thumb highlight
-                this.thumbLightShadowColor = new Color(0, 0, 0, 0);  // Transparent thumb shadow
-                this.thumbDarkShadowColor = new Color(0, 0, 0, 0);  // Transparent thumb dark shadow
-                this.trackHighlightColor = new Color(0, 0, 0, 0);  // Transparent track highlight
-            }
-
-            @Override
-            protected JButton createDecreaseButton(int orientation) {
-                JButton button = super.createDecreaseButton(orientation);
-                button.setPreferredSize(new Dimension(0, 0)); // Make the decrement button invisible
-                button.setVisible(false); // Ensure button is not visible
-                return button;
-            }
-
-            @Override
-            protected JButton createIncreaseButton(int orientation) {
-                JButton button = super.createIncreaseButton(orientation);
-                button.setPreferredSize(new Dimension(0, 0)); // Make the increment button invisible
-                button.setVisible(false); // Ensure button is not visible
-                return button;
-            }
-        });
-
-        // Optional: Make the scrollPane1 and viewport transparent
-        scrollPane1.setOpaque(false); // Optional: to maintain transparency
-        scrollPane1.getViewport().setOpaque(false); // Optional: to maintain transparency
-
-//        addTheProds();
         addTheSuppliers();
-                
+
         pnlAddSupplier.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-//                addProd();
-                addSupplier();
+                AddSupplierApp.showAddSupplierDialog();
+                addTheSuppliers();
             }
         });
+
         panel1.add(pnlAddSupplier);
-        
-        pnlSuppliers.add(scrollPane1); // Add the scrollPane1 to the pnlProducts
+        pnlSuppliers.add(scrollPane1);
 
         return pnlSuppliers;
     }

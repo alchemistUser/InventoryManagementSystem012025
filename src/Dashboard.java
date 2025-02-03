@@ -154,38 +154,38 @@ public class Dashboard {
         
         // icon used: <a href="https://www.flaticon.com/free-icons/user-management" title="user management icons">User management icons created by Vectorslab - Flaticon</a>
         JPanel panel1 = Main.createHoverPanel();
-        panel1.setBounds(60, 30, 200, 100);
+        panel1.setBounds(980, 30, 200, 100);
         path = "src/icons/user-management.png";
         JLabel logo1 = Main.createImage(path);
         logo1.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel1.add(logo1);
-        JPanel pnlNum1 = createNumberPanel(valSystemUsers);
-        pnlNum1.setBounds(94, 5, 100, 50);
-        panel1.add(pnlNum1);
-        JPanel pnlLabel1 = createScaleTextPanel("SYSTEM USERS");
-        pnlLabel1.setBounds(94, 55, 100, 20);
+//        JPanel pnlNum1 = createNumberPanel(valSystemUsers);
+//        pnlNum1.setBounds(94, 5, 100, 50);
+//        panel1.add(pnlNum1);
+        JPanel pnlLabel1 = createScaleTextPanel("ABOUT");
+        pnlLabel1.setBounds(85, 39, 100, 20);
         panel1.add(pnlLabel1);        
         // Add mouse listener for hover effect
         panel1.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 // Show a message dialog when clicked
-                JOptionPane.showMessageDialog(panel1, "Panel1 clicked!", "Message", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(Main.frame, "About", "About", JOptionPane.INFORMATION_MESSAGE);
             }
         });
         pnlDashboard.add(panel1);
         
         JPanel panel2 = Main.createHoverPanel();
-        panel2.setBounds(290, 30, 200, 100);
+        panel2.setBounds(60, 30, 200, 100);
         path = "src/icons/product1.png";
         JLabel logo2 = Main.createImage(path);
         logo2.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel2.add(logo2);
-        JPanel pnlNum2 = createNumberPanel(valProducts);
-        pnlNum2.setBounds(94, 5, 100, 50);
-        panel2.add(pnlNum2);
+//        JPanel pnlNum2 = createNumberPanel(valProducts);
+//        pnlNum2.setBounds(94, 5, 100, 50);
+//        panel2.add(pnlNum2);
         JPanel pnlLabel2 = createScaleTextPanel("PRODUCTS");
-        pnlLabel2.setBounds(94, 55, 100, 20);
+        pnlLabel2.setBounds(85, 39, 100, 20);
         panel2.add(pnlLabel2);   
         // Add mouse listener for hover effect
         panel2.addMouseListener(new MouseAdapter() {
@@ -198,16 +198,16 @@ public class Dashboard {
         pnlDashboard.add(panel2);
         
         JPanel panel3 = Main.createHoverPanel();
-        panel3.setBounds(520, 30, 200, 100);
+        panel3.setBounds(290, 30, 200, 100);
         path = "src/icons/supplier1.png";
         JLabel logo3 = Main.createImage(path);
         logo3.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel3.add(logo3);
-        JPanel pnlNum3 = createNumberPanel(valSuppliers);
-        pnlNum3.setBounds(94, 5, 100, 50);
-        panel3.add(pnlNum3);
+//        JPanel pnlNum3 = createNumberPanel(valSuppliers);
+//        pnlNum3.setBounds(94, 5, 100, 50);
+//        panel3.add(pnlNum3);
         JPanel pnlLabel3 = createScaleTextPanel("SUPPLIERS");
-        pnlLabel3.setBounds(94, 55, 100, 20);
+        pnlLabel3.setBounds(85, 39, 100, 20);
         panel3.add(pnlLabel3);
         // Add mouse listener for hover effect
         panel3.addMouseListener(new MouseAdapter() {
@@ -220,16 +220,16 @@ public class Dashboard {
         pnlDashboard.add(panel3);
         
         JPanel panel4 = Main.createHoverPanel();
-        panel4.setBounds(750, 30, 200, 100);
+        panel4.setBounds(520, 30, 200, 100);
         path = "src/icons/sales1.png";
         JLabel logo4 = Main.createImage(path);
         logo4.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel4.add(logo4);
-        JPanel pnlNum4 = createNumberPanel(valTotalSales);
-        pnlNum4.setBounds(94, 5, 100, 50);
-        panel4.add(pnlNum4);
+//        JPanel pnlNum4 = createNumberPanel(valTotalSales);
+//        pnlNum4.setBounds(94, 5, 100, 50);
+//        panel4.add(pnlNum4);
         JPanel pnlLabel4 = createScaleTextPanel("TOTAL SALES");
-        pnlLabel4.setBounds(94, 55, 100, 20);
+        pnlLabel4.setBounds(85, 39, 100, 20);
         panel4.add(pnlLabel4);
         // Add mouse listener for hover effect
         panel4.addMouseListener(new MouseAdapter() {
@@ -242,16 +242,16 @@ public class Dashboard {
         pnlDashboard.add(panel4);
         
         JPanel panel5 = Main.createHoverPanel();
-        panel5.setBounds(980, 30, 200, 100);
+        panel5.setBounds(750, 30, 200, 100);
         path = "src/icons/warehouse1.png";
         JLabel logo5 = Main.createImage(path);
         logo5.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel5.add(logo5);
-        JPanel pnlNum5 = createNumberPanel(valStocks);
-        pnlNum5.setBounds(94, 5, 100, 50);
-        panel5.add(pnlNum5);
+//        JPanel pnlNum5 = createNumberPanel(valStocks);
+//        pnlNum5.setBounds(94, 5, 100, 50);
+//        panel5.add(pnlNum5);
         JPanel pnlLabel5 = createScaleTextPanel("STOCKS");
-        pnlLabel5.setBounds(94, 55, 100, 20);
+        pnlLabel5.setBounds(85, 39, 100, 20);
         panel5.add(pnlLabel5);
         // Add mouse listener for hover effect
         panel5.addMouseListener(new MouseAdapter() {

@@ -76,25 +76,9 @@ public class Main {
         }
     }
     public static JPanel pnlProducts = Products.pnlProducts();
-    public static JPanel pnlSuppliers;
-    static {
-        try {
-            pnlSuppliers = Suppliers.pnlSuppliers();
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception (e.g., log it or display a message)
-            pnlSuppliers = new JPanel(); // Default to an empty panel to avoid null issues
-        }
-    };
+    public static JPanel pnlSuppliers = Suppliers.pnlSuppliers();
     public static JPanel pnlTotalSales = TotalSales.pnlTotalSales();
-    public static JPanel pnlStocks;
-    static {
-        try {
-            pnlStocks = Stocks.pnlStocks();
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle the exception (e.g., log it or display a message)
-            pnlStocks = new JPanel(); // Default to an empty panel to avoid null issues
-        }
-    };
+    public static JPanel pnlStocks = Stocks.pnlStocks();
     
     public static void refresh(JPanel panel){
         pnlDashboard.revalidate();
@@ -110,6 +94,11 @@ public class Main {
         
         openPanelInPanelMain(panel);
         System.out.println("Refreshed.");
+    }
+    
+    public static void qtyRefresh(){
+        Stocks.refreshTableData();
+        Products.qtyRefreshProd();
     }
     
     // A static variable to track the currently selected panel (the one with the border)
@@ -158,6 +147,10 @@ public class Main {
 
         
         return panel;
+    }
+
+    static JButton createHoverButton(String add_Sales_Transaction, String b9d54, String cfca93, int i, int i0) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
     // RoundedPanel class with image handling
     private static class RoundedPanel extends JPanel {
@@ -373,6 +366,80 @@ public class Main {
         return createHoverPanel(colorDefault, colorHover, width, height, ""); // Default colors and size
     }
     
+public static JPanel createGradientHoverPanel(
+        String colorDefault1,
+        String colorDefault2,
+        String colorHover1,
+        String colorHover2,
+        int width, int height,
+        String text,
+        String textColor) {
+    
+    JPanel panel = new JPanel() {
+        private boolean isHovered = false; // Move isHovered inside the class
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            Graphics2D g2d = (Graphics2D) g.create();
+            g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+            // Define gradient colors based on hover state
+            Color startColor = isHovered ? Color.decode(colorHover1) : Color.decode(colorDefault1);
+            Color endColor = isHovered ? Color.decode(colorHover2) : Color.decode(colorDefault2);
+
+            // Create a gradient paint
+            GradientPaint gradient = new GradientPaint(0, 0, startColor, getWidth(), getHeight(), endColor);
+            g2d.setPaint(gradient);
+
+            // Fill the panel with the gradient
+            g2d.fillRoundRect(0, 0, getWidth(), getHeight(), 30, 30); // Rounded corners
+            g2d.dispose();
+        }
+
+        // Add mouse listeners for hover effect
+        {
+            addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseEntered(MouseEvent e) {
+                    isHovered = true;
+                    repaint(); // Repaint to apply hover gradient
+                }
+
+                @Override
+                public void mouseExited(MouseEvent e) {
+                    isHovered = false;
+                    repaint(); // Repaint to reset to default gradient
+                }
+            });
+        }
+    };
+
+    panel.setLayout(null);
+
+    // Set the initial size
+    panel.setPreferredSize(new Dimension(width, height));
+
+    // Set the panel to non-opaque so custom painting is visible
+    panel.setOpaque(false);
+
+    // Add text to the panel
+    JPanel word = Dashboard.createScaleTextPanel(text, 20, textColor);
+    word.setBounds(0, 0, width, height);
+    panel.add(word);
+
+    return panel;
+}
+
+    public static JPanel createGradientHoverPanel(
+            String colorDefault1,
+            String colorDefault2,
+            String colorHover1,
+            String colorHover2,
+            int width, int height){
+        return createGradientHoverPanel(colorDefault1, colorDefault2, colorHover1, colorHover2, width, height, " ","#ffffff");
+    }
+    
     // Method to create a panel with flex-like layout (horizontal layout) with margin and padding
     public static JPanel createFlexPanel(int marginLeft, int marginTop, int marginRight, int marginBottom, int paddingLeft, int paddingTop, int paddingRight, int paddingBottom) {
         JPanel panel = new JPanel();
@@ -566,7 +633,8 @@ public class Main {
         return createImage(path,1);
     }
     
-    public static void main(String[] args) throws IOException {
+    public static void main(String args[]) throws IOException {
+//    public static void main() throws IOException {
         
         openPanelInPanelMain(pnlDashboard);
                 
