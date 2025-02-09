@@ -1,5 +1,3 @@
-// BACKUP TOTALSALES
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -16,51 +14,55 @@ public class TotalSales {
 
     public static JPanel pnlTotalSales() {
         pnlTotalSales.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
-        pnlTotalSales.setLayout(null);  // Set the layout to null (absolute positioning)
+        pnlTotalSales.setLayout(null);  // Keep null layout
         pnlTotalSales.setBackground(Color.white);
-
-        // Set up the JTable for displaying transaction data
-        JScrollPane salesScrollPane = new JScrollPane(salesTable);
-        JScrollPane restockScrollPane = new JScrollPane(restockTable);
-
-        // Table Panel
-        JPanel tablePanel = new JPanel();
-        tablePanel.setLayout(null);  // Remove layout manager for table panel
-        tablePanel.setBounds(20, 100, pnlTotalSales.getWidth() - 40, pnlTotalSales.getHeight() - 200);  // Position the table panel
-
-        // Label for Sales Table
-        JLabel salesLabel = new JLabel("Sales Transactions", JLabel.CENTER);
-        salesLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        salesLabel.setBounds(0, 10, tablePanel.getWidth(), 25);  // Position the sales label
-        tablePanel.add(salesLabel);
-        salesScrollPane.setBounds(0, 40, tablePanel.getWidth(), tablePanel.getHeight() / 2);  // Set the position for sales table
-        tablePanel.add(salesScrollPane);
-
-        // Label for Restocking Table
-        JLabel restockLabel = new JLabel("Restocking Transactions", JLabel.CENTER);
-        restockLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        restockLabel.setBounds(0, tablePanel.getHeight() / 2 + 10, tablePanel.getWidth(), 25);  // Position the restock label
-        tablePanel.add(restockLabel);
-        restockScrollPane.setBounds(0, tablePanel.getHeight() / 2 + 40, tablePanel.getWidth(), tablePanel.getHeight() / 2);  // Set the position for restock table
-        tablePanel.add(restockScrollPane);
-
-        pnlTotalSales.add(tablePanel);
 
         // Button Panel
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(null);  // Remove layout manager for button panel
-        buttonPanel.setBounds(20, 20, pnlTotalSales.getWidth() - 40, 60);  // Set button panel position
+        buttonPanel.setLayout(null);  // Keep null layout
+        buttonPanel.setBounds(20, 20, pnlTotalSales.getWidth() - 40, 60);  // Position button panel
+        buttonPanel.setBackground(Color.white);
 
         JButton salesButton = new JButton("Add Sales Transaction");
         JButton restockButton = new JButton("Add Restocking Transaction");
 
-        salesButton.setBounds(0, 10, 200, 40);  // Set the bounds of the sales button
-        restockButton.setBounds(220, 10, 200, 40);  // Set the bounds of the restock button
+        salesButton.setBounds(0, 10, 200, 40);  // Position sales button
+        restockButton.setBounds(220, 10, 200, 40);  // Position restock button
 
         buttonPanel.add(salesButton);
         buttonPanel.add(restockButton);
 
         pnlTotalSales.add(buttonPanel);
+
+        // Table Panel
+        JPanel tablePanel = new JPanel();
+        tablePanel.setLayout(null);  // Keep null layout
+        tablePanel.setBounds(20, 100, pnlTotalSales.getWidth() - 40, pnlTotalSales.getHeight() - 150);  // Position table panel
+        tablePanel.setBackground(Color.white);
+
+        // Label for Sales Table
+        JLabel salesLabel = new JLabel("Sales Transactions", JLabel.CENTER);
+        salesLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        salesLabel.setBounds(0, 10, tablePanel.getWidth(), 25);  // Position sales label
+        tablePanel.add(salesLabel);
+
+        // Sales Table
+        JScrollPane salesScrollPane = new JScrollPane(salesTable);
+        salesScrollPane.setBounds(0, 40, tablePanel.getWidth(), (tablePanel.getHeight() / 2) - 30);  // Position sales table
+        tablePanel.add(salesScrollPane);
+
+        // Label for Restocking Table
+        JLabel restockLabel = new JLabel("Restocking Transactions", JLabel.CENTER);
+        restockLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        restockLabel.setBounds(0, (tablePanel.getHeight() / 2) + 10, tablePanel.getWidth(), 25);  // Position restock label
+        tablePanel.add(restockLabel);
+
+        // Restock Table
+        JScrollPane restockScrollPane = new JScrollPane(restockTable);
+        restockScrollPane.setBounds(0, (tablePanel.getHeight() / 2) + 40, tablePanel.getWidth(), (tablePanel.getHeight() / 2) - 30);  // Position restock table
+        tablePanel.add(restockScrollPane);
+
+        pnlTotalSales.add(tablePanel);
 
         // Open sales transaction dialog
         salesButton.addActionListener(new ActionListener() {
@@ -90,7 +92,7 @@ public class TotalSales {
         dialog.setLocationRelativeTo(null);
 
         // Layout setup for the dialog
-        dialog.setLayout(null);  // Set layout to null for absolute positioning
+        dialog.setLayout(null);  // Keep null layout
 
         // Fetch product names and supplier names
         ArrayList<String> productNames = getProductNames();
@@ -127,7 +129,7 @@ public class TotalSales {
         }
 
         JButton addTransactionButton = new JButton("Add Transaction");
-        addTransactionButton.setBounds(120, 140, 150, 30);  // Set the bounds of the button
+        addTransactionButton.setBounds(120, 140, 150, 30);  // Position add transaction button
         dialog.add(addTransactionButton);
 
         addTransactionButton.addActionListener(new ActionListener() {
@@ -164,7 +166,7 @@ public class TotalSales {
 
         dialog.setVisible(true);
     }
-    
+
     private static ArrayList<String> getProductNames() {
         ArrayList<String> productNames = new ArrayList<>();
         String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
@@ -343,7 +345,7 @@ public class TotalSales {
 
         return -1;
     }
-    
+
     // Method to refresh both sales and restock tables
     private static void refreshTables() {
         // Refresh Sales Table with column headers
@@ -366,7 +368,7 @@ public class TotalSales {
         // Fetch and add Restock records
         fetchTransactionData("Restock", restockTableModel);
     }
-    
+
     // Method to fetch transaction data and populate the tables
     private static void fetchTransactionData(String transactionType, DefaultTableModel tableModel) {
         String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
