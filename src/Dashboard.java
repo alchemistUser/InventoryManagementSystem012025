@@ -2,9 +2,8 @@
 /*
 icon used:
 https://www.flaticon.com/free-icon/dashboard_9055107?term=dashboard&page=1&position=53&origin=search&related_id=9055107
-*/
-
-import java.awt.*;    
+ */
+import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
@@ -17,11 +16,10 @@ import javax.swing.*;
 
 decode("#00bf63")
 
-*/
-
+ */
 public class Dashboard {
-    
-    public static JPanel createTextPanel(String labelText, int size, String color, int style) {        
+
+    public static JPanel createTextPanel(String labelText, int size, String color, int style) {
         JPanel panel = new JPanel(new BorderLayout()); // Use BorderLayout for full width
         panel.setPreferredSize(new Dimension(200, 100)); // Set panel size
 
@@ -41,8 +39,6 @@ public class Dashboard {
         return panel;
     }
 
-
-
     // Function that returns the custom JPanel   
     public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color, int style, int horizontalalign) {
         JPanel panel = new JPanel(new BorderLayout());
@@ -50,7 +46,7 @@ public class Dashboard {
         // Create the label with the given text
         JLabel label = new JLabel(labelText, horizontalalign);
         label.setForeground(Color.decode(color));
-        
+
         // Try to apply color based on the value of labelText
         try {
             double i = Integer.parseInt(labelText); // Try to parse the string as an integer
@@ -70,7 +66,7 @@ public class Dashboard {
 
         // Add the label to the center of the panel
         panel.add(label, BorderLayout.CENTER);
-        
+
         panel.setOpaque(false);
 
         // Add a component listener to adjust the font size when the panel is resized
@@ -113,45 +109,50 @@ public class Dashboard {
             }
         });
 
-
         return panel;
     }
-    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color, int style){
+
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color, int style) {
         return createScaleTextPanel(labelText, initialFontSize, color, style, SwingConstants.CENTER);
     }
-    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color){
+
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize, String color) {
         return createScaleTextPanel(labelText, initialFontSize, color, Font.BOLD);
     }
-    public static JPanel createScaleTextPanel(String labelText){
+
+    public static JPanel createScaleTextPanel(String labelText) {
         return createScaleTextPanel(labelText, 20);
     }
-    public static JPanel createScaleTextPanel(String labelText, int initialFontSize){
+
+    public static JPanel createScaleTextPanel(String labelText, int initialFontSize) {
         return createScaleTextPanel(labelText, initialFontSize, "#000000");
     }
-    public static JPanel createNumberPanel(String labelText){
+
+    public static JPanel createNumberPanel(String labelText) {
         return createScaleTextPanel(labelText, 50);
     }
-    
-    public static String valSystemUsers = new String();    
+
+    public static String valSystemUsers = new String();
     public static String valProducts = new String();
     public static String valSuppliers = new String();
     public static String valTotalSales = new String();
     public static String valStocks = new String();
-    
+
     private static final JPanel pnlDashboard = new JPanel();
-    public static JPanel pnlDashboard() throws IOException{
-        valSystemUsers="50";
-        valProducts="51";
-        valSuppliers="52";
-        valTotalSales="53";
-        valStocks="54";
-        
+
+    public static JPanel pnlDashboard() throws IOException {
+        valSystemUsers = "50";
+        valProducts = "51";
+        valSuppliers = "52";
+        valTotalSales = "53";
+        valStocks = "54";
+
         pnlDashboard.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
         pnlDashboard.setLayout(null);
         pnlDashboard.setBackground(Color.white);
-        
+
         String path;
-        
+
         // icon used: <a href="https://www.flaticon.com/free-icons/user-management" title="user management icons">User management icons created by Vectorslab - Flaticon</a>
         JPanel panel1 = Main.createHoverPanel();
         panel1.setBounds(980, 30, 200, 100);
@@ -164,7 +165,7 @@ public class Dashboard {
 //        panel1.add(pnlNum1);
         JPanel pnlLabel1 = createScaleTextPanel("ABOUT");
         pnlLabel1.setBounds(85, 39, 100, 20);
-        panel1.add(pnlLabel1);        
+        panel1.add(pnlLabel1);
         // Add mouse listener for hover effect
         panel1.addMouseListener(new MouseAdapter() {
             @Override
@@ -174,7 +175,7 @@ public class Dashboard {
             }
         });
         pnlDashboard.add(panel1);
-        
+
         JPanel panel2 = Main.createHoverPanel();
         panel2.setBounds(60, 30, 200, 100);
         path = "src/icons/product1.png";
@@ -186,7 +187,7 @@ public class Dashboard {
 //        panel2.add(pnlNum2);
         JPanel pnlLabel2 = createScaleTextPanel("PRODUCTS");
         pnlLabel2.setBounds(85, 39, 100, 20);
-        panel2.add(pnlLabel2);   
+        panel2.add(pnlLabel2);
         // Add mouse listener for hover effect
         panel2.addMouseListener(new MouseAdapter() {
             @Override
@@ -196,7 +197,7 @@ public class Dashboard {
             }
         });
         pnlDashboard.add(panel2);
-        
+
         JPanel panel3 = Main.createHoverPanel();
         panel3.setBounds(290, 30, 200, 100);
         path = "src/icons/supplier1.png";
@@ -218,7 +219,7 @@ public class Dashboard {
             }
         });
         pnlDashboard.add(panel3);
-        
+
         JPanel panel4 = Main.createHoverPanel();
         panel4.setBounds(520, 30, 200, 100);
         path = "src/icons/sales1.png";
@@ -240,7 +241,7 @@ public class Dashboard {
             }
         });
         pnlDashboard.add(panel4);
-        
+
         JPanel panel5 = Main.createHoverPanel();
         panel5.setBounds(750, 30, 200, 100);
         path = "src/icons/warehouse1.png";
@@ -262,7 +263,7 @@ public class Dashboard {
             }
         });
         pnlDashboard.add(panel5);
-        
+
         return pnlDashboard;
     }
 }

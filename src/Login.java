@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.FocusAdapter;
@@ -7,6 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 class RoundedTextField extends JTextField {
+
     private int radius;
 
     public RoundedTextField(int radius) {
@@ -36,6 +38,7 @@ class RoundedTextField extends JTextField {
 }
 
 class RoundedPasswordField extends JPasswordField {
+
     private int radius;
 
     public RoundedPasswordField(int radius) {
@@ -65,6 +68,7 @@ class RoundedPasswordField extends JPasswordField {
 }
 
 public class Login extends JFrame {
+
     private RoundedTextField usernameField;
     private RoundedPasswordField passwordField;
     private JButton loginButton;

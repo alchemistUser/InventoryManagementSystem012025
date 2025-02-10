@@ -1,9 +1,11 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
 public class SalesTransactionDialog extends JDialog {
+
     private JTextField productIdField;
     private JTextField quantityField;
     private JComboBox<String> transactionTypeBox;
@@ -60,8 +62,7 @@ public class SalesTransactionDialog extends JDialog {
 
         String sql = "INSERT INTO transactions (product_id, transaction_type, quantity, transaction_date) VALUES (?, ?, ?, NOW())";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, Integer.parseInt(productId));
             preparedStatement.setString(2, transactionType);

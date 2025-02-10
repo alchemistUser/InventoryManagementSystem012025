@@ -1,9 +1,11 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.UUID;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
 public class TotalSales {
@@ -12,78 +14,104 @@ public class TotalSales {
     private static JTable salesTable = new JTable();
     private static JTable restockTable = new JTable();
 
-    public static JPanel pnlTotalSales() {
-        pnlTotalSales.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
-        pnlTotalSales.setLayout(null);  // Keep null layout
-        pnlTotalSales.setBackground(Color.white);
+public static JPanel pnlTotalSales() {
+    int placeholderWidth = Main.pnlMainWidth;
+    int placeholderHeight = Main.pnlMainHeight;
 
-        // Button Panel
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(null);  // Keep null layout
-        buttonPanel.setBounds(20, 20, pnlTotalSales.getWidth() - 40, 60);  // Position button panel
-        buttonPanel.setBackground(Color.white);
+    pnlTotalSales.setSize(placeholderWidth, placeholderHeight);
+    pnlTotalSales.setLayout(null); // Use null layout
+    pnlTotalSales.setBackground(Color.white);
 
-        JButton salesButton = new JButton("Add Sales Transaction");
-        JButton restockButton = new JButton("Add Restocking Transaction");
+    // HEADER PANEL
+    JPanel headerPanel = Main.createRoundedPanel(45, "#4CAF50");
+    headerPanel.setBounds(0, 0, placeholderWidth, 60); // Manually position
+    headerPanel.setLayout(new BorderLayout());
 
-        salesButton.setBounds(0, 10, 200, 40);  // Position sales button
-        restockButton.setBounds(220, 10, 200, 40);  // Position restock button
+    JLabel titleLabel = new JLabel("TOTAL SALES", JLabel.CENTER);
+    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+    titleLabel.setForeground(Color.WHITE);
+    headerPanel.add(titleLabel, BorderLayout.CENTER);
+    pnlTotalSales.add(headerPanel);
 
-        buttonPanel.add(salesButton);
-        buttonPanel.add(restockButton);
+    // CONTENT PANEL (to be placed inside JScrollPane)
+    JPanel contentPanel = new JPanel();
+    contentPanel.setLayout(null); // Null layout for precise control
+    contentPanel.setPreferredSize(new Dimension(placeholderWidth - 40, 700)); // Must exceed viewport height to enable scrolling
+    contentPanel.setBackground(Color.white);
 
-        pnlTotalSales.add(buttonPanel);
+    // SALES TABLE SECTION
+    JLabel salesLabel = new JLabel("Sales Transactions", JLabel.CENTER);
+    salesLabel.setFont(new Font("Arial", Font.BOLD, 16));
+    salesLabel.setBounds(20, 20, placeholderWidth - 80, 30);
+    contentPanel.add(salesLabel);
 
-        // Table Panel
-        JPanel tablePanel = new JPanel();
-        tablePanel.setLayout(null);  // Keep null layout
-        tablePanel.setBounds(20, 100, pnlTotalSales.getWidth() - 40, pnlTotalSales.getHeight() - 150);  // Position table panel
-        tablePanel.setBackground(Color.white);
+    JScrollPane salesScrollPane = new JScrollPane(salesTable);
+    salesScrollPane.setBounds(20, 60, placeholderWidth - 80, 300);
+    contentPanel.add(salesScrollPane);
 
-        // Label for Sales Table
-        JLabel salesLabel = new JLabel("Sales Transactions", JLabel.CENTER);
-        salesLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        salesLabel.setBounds(0, 10, tablePanel.getWidth(), 25);  // Position sales label
-        tablePanel.add(salesLabel);
+    JButton salesButton = new JButton("Add Sales Transaction");
+    salesButton.setBounds(20, 370, 200, 30);
+    contentPanel.add(salesButton);
 
-        // Sales Table
-        JScrollPane salesScrollPane = new JScrollPane(salesTable);
-        salesScrollPane.setBounds(0, 40, tablePanel.getWidth(), (tablePanel.getHeight() / 2) - 30);  // Position sales table
-        tablePanel.add(salesScrollPane);
+    // RESTOCK TABLE SECTION
+    JLabel restockLabel = new JLabel("Restocking Transactions", JLabel.CENTER);
+    restockLabel.setFont(new Font("Arial", Font.BOLD, 16));
+    restockLabel.setBounds(20, 420, placeholderWidth - 80, 30);
+    contentPanel.add(restockLabel);
 
-        // Label for Restocking Table
-        JLabel restockLabel = new JLabel("Restocking Transactions", JLabel.CENTER);
-        restockLabel.setFont(new Font("Arial", Font.BOLD, 16));
-        restockLabel.setBounds(0, (tablePanel.getHeight() / 2) + 10, tablePanel.getWidth(), 25);  // Position restock label
-        tablePanel.add(restockLabel);
+    JScrollPane restockScrollPane = new JScrollPane(restockTable);
+    restockScrollPane.setBounds(20, 460, placeholderWidth - 80, 300);
+    contentPanel.add(restockScrollPane);
 
-        // Restock Table
-        JScrollPane restockScrollPane = new JScrollPane(restockTable);
-        restockScrollPane.setBounds(0, (tablePanel.getHeight() / 2) + 40, tablePanel.getWidth(), (tablePanel.getHeight() / 2) - 30);  // Position restock table
-        tablePanel.add(restockScrollPane);
+    JButton restockButton = new JButton("Add Restocking Transaction");
+    restockButton.setBounds(20, 770, 250, 30);
+    contentPanel.add(restockButton);
 
-        pnlTotalSales.add(tablePanel);
+    // SCROLL PANEL (Wrap contentPanel in JScrollPane)
+    JScrollPane mainScrollPane = new JScrollPane(contentPanel);
+    mainScrollPane.setBounds(0, 60, placeholderWidth, placeholderHeight - 60); // Fill remaining space
+    mainScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+    pnlTotalSales.add(mainScrollPane);
 
-        // Open sales transaction dialog
-        salesButton.addActionListener(new ActionListener() {
+    // EVENT LISTENERS
+    salesButton.addActionListener(e -> openTransactionDialog("Sale"));
+    restockButton.addActionListener(e -> openTransactionDialog("Restock"));
+
+    // LOAD DATA & APPLY STYLING
+    refreshTables();
+    styleTable(salesTable);
+    styleTable(restockTable);
+
+    return pnlTotalSales;
+}
+
+    private static void styleTable(JTable table) {
+        // Set custom header renderer
+        table.getTableHeader().setFont(new Font("Arial", Font.BOLD, 20));
+        table.getTableHeader().setBackground(Color.decode("#4CAF50")); // Customize header color
+        table.getTableHeader().setForeground(Color.WHITE);
+        table.getTableHeader().setPreferredSize(new Dimension(table.getTableHeader().getPreferredSize().width, 40));
+
+        // Set table properties
+        table.setGridColor(Color.WHITE);
+        table.setBackground(Color.decode("#E4E4E4"));
+        table.setFont(new Font("Arial", Font.PLAIN, 16));
+        table.setRowHeight(40);
+        table.setSelectionBackground(Color.WHITE);
+
+        // Add padding to cells
+        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
             @Override
-            public void actionPerformed(ActionEvent e) {
-                openTransactionDialog("Sale");
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                if (c instanceof JLabel) {
+                    JLabel label = (JLabel) c;
+                    label.setHorizontalAlignment(SwingConstants.LEFT); // Align text to the left
+                    label.setBorder(BorderFactory.createEmptyBorder(0, 20, 0, 20)); // Padding
+                }
+                return c;
             }
         });
-
-        // Open restocking transaction dialog
-        restockButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                openTransactionDialog("Restock");
-            }
-        });
-
-        // Call refreshTables() to load data immediately after panel setup
-        refreshTables();
-
-        return pnlTotalSales;
     }
 
     private static void openTransactionDialog(String transactionType) {
@@ -174,9 +202,7 @@ public class TotalSales {
         String password = "";
 
         String sql = "SELECT name FROM products WHERE status = 1";
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
                 productNames.add(resultSet.getString("name"));
@@ -195,9 +221,7 @@ public class TotalSales {
         String password = "";
 
         String sql = "SELECT supplier_name FROM suppliers WHERE status = 1";
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
                 supplierNames.add(resultSet.getString("supplier_name"));
@@ -307,8 +331,7 @@ public class TotalSales {
         String password = "";
 
         String sql = "SELECT quantity_in_stock FROM products WHERE product_id = ?";
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setInt(1, productId);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -330,8 +353,7 @@ public class TotalSales {
         String password = "";
 
         String sql = "SELECT product_id FROM products WHERE name = ?";
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, productName);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -349,15 +371,25 @@ public class TotalSales {
     // Method to refresh both sales and restock tables
     private static void refreshTables() {
         // Refresh Sales Table with column headers
-        DefaultTableModel salesTableModel = new DefaultTableModel();
-        salesTableModel.setColumnIdentifiers(new Object[] {
+        DefaultTableModel salesTableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        };
+        salesTableModel.setColumnIdentifiers(new Object[]{
             "Product Name", "Quantity", "Transaction Type", "Date", "Reference No"
         });
         salesTable.setModel(salesTableModel);
 
         // Refresh Restock Table with column headers
-        DefaultTableModel restockTableModel = new DefaultTableModel();
-        restockTableModel.setColumnIdentifiers(new Object[] {
+        DefaultTableModel restockTableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells non-editable
+            }
+        };
+        restockTableModel.setColumnIdentifiers(new Object[]{
             "Product Name", "Quantity", "Transaction Type", "Date", "Reference No", "Supplier"
         });
         restockTable.setModel(restockTableModel);
@@ -376,20 +408,19 @@ public class TotalSales {
         String password = "";
 
         String sql = "SELECT products.name, transactions.quantity, transactions.transaction_type, transactions.transaction_date, transactions.reference_no, transactions.supplier_name FROM transactions JOIN products ON transactions.product_id = products.product_id WHERE transactions.transaction_type = ?";
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, transactionType);
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()) {
-                Object[] rowData = new Object[] {
-                        resultSet.getString("name"),
-                        resultSet.getInt("quantity"),
-                        resultSet.getString("transaction_type"),
-                        resultSet.getTimestamp("transaction_date"),
-                        resultSet.getString("reference_no"),
-                        resultSet.getString("supplier_name") == null ? "" : resultSet.getString("supplier_name")
+                Object[] rowData = new Object[]{
+                    resultSet.getString("name"),
+                    resultSet.getInt("quantity"),
+                    resultSet.getString("transaction_type"),
+                    resultSet.getTimestamp("transaction_date"),
+                    resultSet.getString("reference_no"),
+                    resultSet.getString("supplier_name") == null ? "" : resultSet.getString("supplier_name")
                 };
                 tableModel.addRow(rowData);
             }

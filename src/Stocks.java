@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,6 +18,7 @@ import javax.swing.table.TableRowSorter;
 import javax.swing.RowFilter;
 
 public class Stocks {
+
     private static JPanel pnlStocks = new JPanel();
     private static JTable table; // Make the table a class-level variable
     private static DefaultTableModel model; // Make the table model a class-level variable
@@ -82,9 +84,15 @@ public class Stocks {
             JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
         } finally {
             try {
-                if (resultSet != null) resultSet.close();
-                if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) connection.close();
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error closing connection: " + e.getMessage());
             }
@@ -162,6 +170,7 @@ public class Stocks {
 
     // Custom TableCellRenderer for the button
     static class ButtonRenderer extends JButton implements TableCellRenderer {
+
         public ButtonRenderer() {
             setOpaque(true); // Make button opaque so it displays properly in the table
         }
@@ -175,6 +184,7 @@ public class Stocks {
 
     // Custom TableCellEditor for the button
     static class ButtonEditor extends DefaultCellEditor {
+
         private JButton button;
         private String text;
         private boolean isPushed;
@@ -304,6 +314,7 @@ public class Stocks {
 
     // Custom Rounded Border Class
     static class RoundedBorder extends AbstractBorder {
+
         private int radius;
 
         RoundedBorder(int radius) {
@@ -319,7 +330,7 @@ public class Stocks {
             g2.dispose();
         }
     }
-    
+
     public static void refreshTableData() {
         // Clear the existing rows in the table model
         model.setRowCount(0); // This will remove all the rows from the table model
@@ -358,9 +369,15 @@ public class Stocks {
             JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
         } finally {
             try {
-                if (resultSet != null) resultSet.close();
-                if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) connection.close();
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error closing connection: " + e.getMessage());
             }

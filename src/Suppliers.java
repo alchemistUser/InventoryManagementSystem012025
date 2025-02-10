@@ -1,3 +1,4 @@
+
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.util.logging.Logger;
 import javax.swing.*;
 
 public class Suppliers {
+
     private static JPanel pnlSuppliers = new JPanel();
     private static JPanel panel1 = new JPanel();
     static int suppwidth = 200;
@@ -24,10 +26,8 @@ public class Suppliers {
         if (!showUnavailable) {
             query += " WHERE status = 1"; // Only show active suppliers
         }
-        
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/imsadmin_imsfd", "root", "");
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(query)) {
+
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/imsadmin_imsfd", "root", ""); Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
 
             while (rs.next()) {
                 String supplierId = rs.getString("supplier_id");
@@ -49,9 +49,9 @@ public class Suppliers {
 
     static JPanel createSupplier(String supplierId, String name, String company, String contactno, String email, boolean status) {
         JPanel panel = Main.createGradientHoverPanel(
-            "#1b9d54", "#cfca93", 
-            "#76c498", "#e2dfbe", 
-            suppwidth, suppheight
+                "#1b9d54", "#cfca93",
+                "#76c498", "#e2dfbe",
+                suppwidth, suppheight
         );
         panel.setLayout(null);
 
@@ -97,7 +97,7 @@ public class Suppliers {
 
         return panel;
     }
-    
+
     public static JPanel pnlSuppliers() {
         pnlSuppliers.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
         pnlSuppliers.setLayout(null);

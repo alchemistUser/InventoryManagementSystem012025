@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -54,32 +55,39 @@ public class AddSupplierApp {
         saveButton.setBackground(new Color(0x16, 0x9d, 0x53));
         saveButton.setFocusable(false);
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0;
+        gbc.gridy = 0;
         dialog.add(new JLabel("SUPPLIER NAME:"), gbc);
         gbc.gridx = 1;
         dialog.add(supplierNameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0;
+        gbc.gridy = 1;
         dialog.add(new JLabel("COMPANY NAME:"), gbc);
         gbc.gridx = 1;
         dialog.add(companyNameField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         dialog.add(new JLabel("CONTACT NO:"), gbc);
         gbc.gridx = 1;
         dialog.add(contactField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         dialog.add(new JLabel("EMAIL:"), gbc);
         gbc.gridx = 1;
         dialog.add(emailField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0;
+        gbc.gridy = 4;
         dialog.add(new JLabel("STATUS:"), gbc);
         gbc.gridx = 1;
         dialog.add(statusCheckbox, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 5;
+        gbc.gridwidth = 2;
         dialog.add(saveButton, gbc);
 
         saveButton.addActionListener(new ActionListener() {
@@ -126,8 +134,7 @@ public class AddSupplierApp {
 
         String sql = "INSERT INTO suppliers (supplier_name, supplier_company_name, contact_no, email, status) VALUES (?, ?, ?, ?, ?)";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, supplierName);
             preparedStatement.setString(2, companyName);
@@ -151,8 +158,7 @@ public class AddSupplierApp {
 
         String sql = "UPDATE suppliers SET supplier_name = ?, supplier_company_name = ?, contact_no = ?, email = ?, status = ? WHERE supplier_id = ?";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, supplierName);
             preparedStatement.setString(2, companyName);

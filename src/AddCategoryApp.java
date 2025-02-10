@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -74,10 +75,10 @@ public class AddCategoryApp {
                         // Update existing category
                         if (updateCategory(categoryId, newCategoryName)) {
                             JOptionPane.showMessageDialog(dialog, "Category updated: " + newCategoryName, "Success", JOptionPane.INFORMATION_MESSAGE);
-                            
+
                             Products.addTheCats();
                             Products.cataddpanel();
-                            
+
                             dialog.dispose();
                         } else {
                             JOptionPane.showMessageDialog(dialog, "Failed to update category.", "Error", JOptionPane.ERROR_MESSAGE);
@@ -97,8 +98,7 @@ public class AddCategoryApp {
 
         String sql = "INSERT INTO categories (category_name) VALUES (?)";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, categoryName);
 
@@ -118,8 +118,7 @@ public class AddCategoryApp {
 
         String sql = "UPDATE categories SET category_name = ? WHERE category_id = ?";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, categoryName);
             preparedStatement.setString(2, categoryId);

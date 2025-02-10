@@ -1,3 +1,4 @@
+
 import java.sql.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,9 +9,10 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class Products {
+
     private static JCheckBox showUnavailableCheckbox = new JCheckBox("Show Unavailable");
-    
-    public static void addTheCats() {        
+
+    public static void addTheCats() {
         pnlflex.removeAll();
         pnlflex.revalidate();
         pnlflex.repaint();
@@ -39,9 +41,15 @@ public class Products {
             JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
         } finally {
             try {
-                if (resultSet != null) resultSet.close();
-                if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) connection.close();
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error closing connection: " + e.getMessage());
             }
@@ -49,7 +57,7 @@ public class Products {
 
         pnlflex.revalidate();
         pnlflex.repaint();
-    }    
+    }
 
     public static void addTheProds() {
         panel1.removeAll();
@@ -99,9 +107,15 @@ public class Products {
             JOptionPane.showMessageDialog(null, "Database error: " + e.getMessage());
         } finally {
             try {
-                if (resultSet != null) resultSet.close();
-                if (preparedStatement != null) preparedStatement.close();
-                if (connection != null) connection.close();
+                if (resultSet != null) {
+                    resultSet.close();
+                }
+                if (preparedStatement != null) {
+                    preparedStatement.close();
+                }
+                if (connection != null) {
+                    connection.close();
+                }
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, "Error closing connection: " + e.getMessage());
             }
@@ -109,12 +123,13 @@ public class Products {
 
         panel1.revalidate();
         panel1.repaint();
-    }    
-    
-    public static void cataddpanel(){
+    }
+
+    public static void cataddpanel() {
         pnlflex.add(pnlAddCategory);
     }
-    public static void prodaddpanel(){
+
+    public static void prodaddpanel() {
         panel1.add(pnlAddProduct);
     }
 
@@ -138,7 +153,7 @@ public class Products {
 
     static JPanel createProductItem(String productId, String name, String category, String price, String quantity, String reorder, String status, String description) {
 //        JPanel panel = Main.createHoverPanel(Main.stringcolorPanelBG, "#94C3A0", catwidth, catheight);
-        JPanel panel = Main.createGradientHoverPanel("#1b9d54", "#cfca93", "#76c498","#e2dfbe",catwidth,catheight);
+        JPanel panel = Main.createGradientHoverPanel("#1b9d54", "#cfca93", "#76c498", "#e2dfbe", catwidth, catheight);
 
         panel.setLayout(null);
 
@@ -228,7 +243,7 @@ public class Products {
 
     static void addProd() {
         addProd("", "", "", "");
-    }    
+    }
 
     private static JPanel pnlProducts = new JPanel();
     static int catwidth = 200;
@@ -245,7 +260,7 @@ public class Products {
         pnlProducts.setSize(Main.pnlMainWidth, Main.pnlMainHeight);
         pnlProducts.setLayout(null); // Using null layout for manual positioning
         pnlProducts.setBackground(Color.white);
-        
+
         JLabel lblcat = new JLabel("Categories");
         lblcat.setBounds(80, 11, 65, 20);
 //        lblcat.setBackground(Color.red);
@@ -327,7 +342,6 @@ public class Products {
         pnlProducts.add(panel);
 
         //----------------------
-
         // Create the second panel (panel1)
         panel1.setBounds(70, 160, Main.pnlMainWidth - 140, Main.pnlMainHeight - 180);
         panel1.setBackground(Color.white);
@@ -413,7 +427,8 @@ public class Products {
 
         return pnlProducts;
     }
-    public static void qtyRefreshProd(){
+
+    public static void qtyRefreshProd() {
         addTheProds();
         prodaddpanel();
     }

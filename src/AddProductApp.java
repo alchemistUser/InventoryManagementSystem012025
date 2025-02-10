@@ -1,3 +1,4 @@
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -128,12 +129,12 @@ public class AddProductApp {
                     // Update existing product
                     if (updateProduct(productId, productName, category, price, reorderLevel, status, details)) {
                         JOptionPane.showMessageDialog(dialog, "Product updated: " + productName, "Success", JOptionPane.INFORMATION_MESSAGE);
-                        
+
                         Products.addTheProds();
                         Products.prodaddpanel();
                         Stocks.functionTable();
                         dialog.dispose();
-                                                
+
                     } else {
                         JOptionPane.showMessageDialog(dialog, "Failed to update product.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
@@ -153,8 +154,7 @@ public class AddProductApp {
 
         String sql = "SELECT name, category, price, reorder_level, status, description FROM products WHERE product_id = ?";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
@@ -179,8 +179,7 @@ public class AddProductApp {
 
         String sql = "INSERT INTO products (name, category, price, reorder_level, status, description) VALUES (?, ?, ?, ?, ?, ?)";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, productName);
             preparedStatement.setString(2, category);
@@ -204,8 +203,7 @@ public class AddProductApp {
 
         String sql = "UPDATE products SET name = ?, category = ?, price = ?, reorder_level = ?, status = ?, description = ? WHERE product_id = ?";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
 
             preparedStatement.setString(1, productName);
             preparedStatement.setString(2, category);
@@ -214,14 +212,14 @@ public class AddProductApp {
             preparedStatement.setBoolean(5, status);
             preparedStatement.setString(6, details);
             preparedStatement.setString(7, id);
-                        
+
             return preparedStatement.executeUpdate() > 0;
 
         } catch (SQLException e) {
             e.printStackTrace();
             return false;
         }
-        
+
     }
 
     private static String[] getCategories() {
@@ -232,9 +230,7 @@ public class AddProductApp {
 
         String sql = "SELECT category_name FROM categories";
 
-        try (Connection connection = DriverManager.getConnection(url, user, password);
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(sql)) {
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
 
             while (resultSet.next()) {
                 categories.add(resultSet.getString("category_name"));
