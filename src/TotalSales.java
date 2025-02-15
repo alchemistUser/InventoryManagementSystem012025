@@ -7,6 +7,14 @@ import java.util.ArrayList;
 import java.util.UUID;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 
 public class TotalSales {
 
@@ -14,76 +22,281 @@ public class TotalSales {
     private static JTable salesTable = new JTable();
     private static JTable restockTable = new JTable();
 
-public static JPanel pnlTotalSales() {
-    int placeholderWidth = Main.pnlMainWidth;
-    int placeholderHeight = Main.pnlMainHeight;
+    private static int height = 2500;
 
-    pnlTotalSales.setSize(placeholderWidth, placeholderHeight);
-    pnlTotalSales.setLayout(null); // Use null layout
-    pnlTotalSales.setBackground(Color.white);
+    public static JPanel pnlTotalSales() {
+        int placeholderWidth = Main.pnlMainWidth;
+        int placeholderHeight = Main.pnlMainHeight;
 
-    // HEADER PANEL
-    JPanel headerPanel = Main.createRoundedPanel(45, "#4CAF50");
-    headerPanel.setBounds(0, 0, placeholderWidth, 60); // Manually position
-    headerPanel.setLayout(new BorderLayout());
+        pnlTotalSales.setSize(placeholderWidth, placeholderHeight);
+        pnlTotalSales.setLayout(null); // Use null layout
+        pnlTotalSales.setBackground(Color.white);
 
-    JLabel titleLabel = new JLabel("TOTAL SALES", JLabel.CENTER);
-    titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
-    titleLabel.setForeground(Color.WHITE);
-    headerPanel.add(titleLabel, BorderLayout.CENTER);
-    pnlTotalSales.add(headerPanel);
+        // HEADER PANEL (Not rounded)
+        JPanel headerPanel = new JPanel(); // Use a standard JPanel
+        headerPanel.setBounds(0, 0, placeholderWidth, 60); // Manually position
+        headerPanel.setLayout(new BorderLayout());
+        headerPanel.setBackground(Color.decode("#4CAF50")); // Set background color
 
-    // CONTENT PANEL (to be placed inside JScrollPane)
-    JPanel contentPanel = new JPanel();
-    contentPanel.setLayout(null); // Null layout for precise control
-    contentPanel.setPreferredSize(new Dimension(placeholderWidth - 40, 700)); // Must exceed viewport height to enable scrolling
-    contentPanel.setBackground(Color.white);
+        JLabel titleLabel = new JLabel("TOTAL SALES", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        titleLabel.setForeground(Color.WHITE);
+        headerPanel.add(titleLabel, BorderLayout.CENTER);
+        pnlTotalSales.add(headerPanel);
 
-    // SALES TABLE SECTION
-    JLabel salesLabel = new JLabel("Sales Transactions", JLabel.CENTER);
-    salesLabel.setFont(new Font("Arial", Font.BOLD, 16));
-    salesLabel.setBounds(20, 20, placeholderWidth - 80, 30);
-    contentPanel.add(salesLabel);
+        // CONTENT PANEL (to be placed inside JScrollPane)
+        JPanel contentPanel = new JPanel();
+        contentPanel.setLayout(null); // Null layout for precise control
+        contentPanel.setPreferredSize(new Dimension(placeholderWidth - 40, height)); // Increased height to accommodate the charts
+        contentPanel.setBackground(Color.white);
 
-    JScrollPane salesScrollPane = new JScrollPane(salesTable);
-    salesScrollPane.setBounds(20, 60, placeholderWidth - 80, 300);
-    contentPanel.add(salesScrollPane);
+        // CHART SECTION (Moved to the top)
+        JLabel chartLabel = new JLabel("Sales and Restocking Overview", JLabel.CENTER);
+        chartLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        chartLabel.setBounds(20, 20, placeholderWidth - 80, 30);
+        contentPanel.add(chartLabel);
 
-    JButton salesButton = new JButton("Add Sales Transaction");
-    salesButton.setBounds(20, 370, 200, 30);
-    contentPanel.add(salesButton);
+        // Create and add the bar chart
+        JFreeChart barChart = createBarChart();
+        ChartPanel barChartPanel = new ChartPanel(barChart);
+        barChartPanel.setBounds(20, 60, placeholderWidth - 80, 300);
+        contentPanel.add(barChartPanel);
 
-    // RESTOCK TABLE SECTION
-    JLabel restockLabel = new JLabel("Restocking Transactions", JLabel.CENTER);
-    restockLabel.setFont(new Font("Arial", Font.BOLD, 16));
-    restockLabel.setBounds(20, 420, placeholderWidth - 80, 30);
-    contentPanel.add(restockLabel);
+        // Add a line chart for sales and restocking trends over time
+        JFreeChart lineChart = createLineChart();
+        ChartPanel lineChartPanel = new ChartPanel(lineChart);
+        lineChartPanel.setBounds(20, 380, placeholderWidth - 80, 300);
+        contentPanel.add(lineChartPanel);
 
-    JScrollPane restockScrollPane = new JScrollPane(restockTable);
-    restockScrollPane.setBounds(20, 460, placeholderWidth - 80, 300);
-    contentPanel.add(restockScrollPane);
+        // Add a bar chart for top-selling products
+        JFreeChart topSalesChart = createTopSalesChart();
+        ChartPanel topSalesChartPanel = new ChartPanel(topSalesChart);
+        topSalesChartPanel.setBounds(20, 700, placeholderWidth - 80, 300);
+        contentPanel.add(topSalesChartPanel);
 
-    JButton restockButton = new JButton("Add Restocking Transaction");
-    restockButton.setBounds(20, 770, 250, 30);
-    contentPanel.add(restockButton);
+        // Add a bar chart for top-restocked products
+        JFreeChart topRestockChart = createTopRestockChart();
+        ChartPanel topRestockChartPanel = new ChartPanel(topRestockChart);
+        topRestockChartPanel.setBounds(20, 1020, placeholderWidth - 80, 300);
+        contentPanel.add(topRestockChartPanel);
 
-    // SCROLL PANEL (Wrap contentPanel in JScrollPane)
-    JScrollPane mainScrollPane = new JScrollPane(contentPanel);
-    mainScrollPane.setBounds(0, 60, placeholderWidth, placeholderHeight - 60); // Fill remaining space
-    mainScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-    pnlTotalSales.add(mainScrollPane);
+        // SALES TABLE SECTION (Moved below charts)
+        JLabel salesLabel = new JLabel("Sales Transactions", JLabel.CENTER);
+        salesLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        salesLabel.setBounds(20, 1340, placeholderWidth - 80, 30);
+        contentPanel.add(salesLabel);
 
-    // EVENT LISTENERS
-    salesButton.addActionListener(e -> openTransactionDialog("Sale"));
-    restockButton.addActionListener(e -> openTransactionDialog("Restock"));
+        JScrollPane salesScrollPane = new JScrollPane(salesTable);
+        salesScrollPane.setBounds(20, 1380, placeholderWidth - 80, 300);
+        contentPanel.add(salesScrollPane);
 
-    // LOAD DATA & APPLY STYLING
-    refreshTables();
-    styleTable(salesTable);
-    styleTable(restockTable);
+        JButton salesButton = new JButton("Add Sales Transaction");
+        salesButton.setBounds(20, 1690, 200, 30);
+        contentPanel.add(salesButton);
 
-    return pnlTotalSales;
-}
+        // RESTOCK TABLE SECTION (Moved below charts)
+        JLabel restockLabel = new JLabel("Restocking Transactions", JLabel.CENTER);
+        restockLabel.setFont(new Font("Arial", Font.BOLD, 16));
+        restockLabel.setBounds(20, 1740, placeholderWidth - 80, 30);
+        contentPanel.add(restockLabel);
+
+        JScrollPane restockScrollPane = new JScrollPane(restockTable);
+        restockScrollPane.setBounds(20, 1780, placeholderWidth - 80, 300);
+        contentPanel.add(restockScrollPane);
+
+        JButton restockButton = new JButton("Add Restocking Transaction");
+        restockButton.setBounds(20, 2090, 250, 30);
+        contentPanel.add(restockButton);
+
+        // SCROLL PANEL (Wrap contentPanel in JScrollPane)
+        JScrollPane mainScrollPane = new JScrollPane(contentPanel);
+        mainScrollPane.setBounds(0, 60, placeholderWidth, placeholderHeight - 60); // Fill remaining space
+        mainScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        pnlTotalSales.add(mainScrollPane);
+
+        // EVENT LISTENERS
+        salesButton.addActionListener(e -> openTransactionDialog("Sale"));
+        restockButton.addActionListener(e -> openTransactionDialog("Restock"));
+
+        // LOAD DATA & APPLY STYLING
+        refreshTables();
+        styleTable(salesTable);
+        styleTable(restockTable);
+
+        return pnlTotalSales;
+    }
+    
+    
+
+    private static JFreeChart createTopRestockChart() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // Fetch top-restocked products
+        String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
+        String user = "root";
+        String password = "";
+
+        String sql = "SELECT products.name, SUM(transactions.quantity) AS total_quantity FROM transactions JOIN products ON transactions.product_id = products.product_id WHERE transactions.transaction_type = 'Restock' GROUP BY products.name ORDER BY total_quantity DESC LIMIT 10";
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                String productName = resultSet.getString("name");
+                int totalQuantity = resultSet.getInt("total_quantity");
+                dataset.addValue(totalQuantity, "Quantity", productName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create the bar chart
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Top Restocked Products", // Chart title
+                "Product", // Category axis label
+                "Quantity Restocked", // Value axis label
+                dataset, // Data
+                PlotOrientation.VERTICAL, // Orientation
+                true, // Include legend
+                true, // Tooltips
+                false // URLs
+        );
+
+        return barChart;
+    }
+
+    private static JFreeChart createTopSalesChart() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // Fetch top-selling products
+        String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
+        String user = "root";
+        String password = "";
+
+        String sql = "SELECT products.name, SUM(transactions.quantity) AS total_quantity FROM transactions JOIN products ON transactions.product_id = products.product_id WHERE transactions.transaction_type = 'Sale' GROUP BY products.name ORDER BY total_quantity DESC LIMIT 10";
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                String productName = resultSet.getString("name");
+                int totalQuantity = resultSet.getInt("total_quantity");
+                dataset.addValue(totalQuantity, "Quantity", productName);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create the bar chart
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Top Selling Products", // Chart title
+                "Product", // Category axis label
+                "Quantity Sold", // Value axis label
+                dataset, // Data
+                PlotOrientation.VERTICAL, // Orientation
+                true, // Include legend
+                true, // Tooltips
+                false // URLs
+        );
+
+        return barChart;
+    }
+
+    private static JFreeChart createLineChart() {
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+
+        // Fetch sales and restocking data over time
+        String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
+        String user = "root";
+        String password = "";
+
+        String sql = "SELECT transaction_type, transaction_date, quantity FROM transactions ORDER BY transaction_date";
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            TimeSeries salesSeries = new TimeSeries("Sales");
+            TimeSeries restockSeries = new TimeSeries("Restock");
+
+            // Use a map to aggregate quantities by date
+            java.util.Map<Day, Integer> salesMap = new java.util.HashMap<>();
+            java.util.Map<Day, Integer> restockMap = new java.util.HashMap<>();
+
+            while (resultSet.next()) {
+                String transactionType = resultSet.getString("transaction_type");
+                java.sql.Timestamp transactionTimestamp = resultSet.getTimestamp("transaction_date");
+                java.util.Date transactionDate = new java.util.Date(transactionTimestamp.getTime()); // Convert to java.util.Date
+                int quantity = resultSet.getInt("quantity");
+
+                Day day = new Day(transactionDate); // Use java.util.Date
+
+                if ("Sale".equals(transactionType)) {
+                    // Aggregate sales quantities for the same day
+                    salesMap.put(day, salesMap.getOrDefault(day, 0) + quantity);
+                } else if ("Restock".equals(transactionType)) {
+                    // Aggregate restock quantities for the same day
+                    restockMap.put(day, restockMap.getOrDefault(day, 0) + quantity);
+                }
+            }
+
+            // Add aggregated sales data to the sales series
+            for (java.util.Map.Entry<Day, Integer> entry : salesMap.entrySet()) {
+                salesSeries.add(entry.getKey(), entry.getValue());
+            }
+
+            // Add aggregated restock data to the restock series
+            for (java.util.Map.Entry<Day, Integer> entry : restockMap.entrySet()) {
+                restockSeries.add(entry.getKey(), entry.getValue());
+            }
+
+            dataset.addSeries(salesSeries);
+            dataset.addSeries(restockSeries);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create the line chart
+        JFreeChart lineChart = ChartFactory.createTimeSeriesChart(
+                "Sales and Restocking Trends Over Time", // Chart title
+                "Date", // X-axis label
+                "Quantity", // Y-axis label
+                dataset, // Data
+                true, // Include legend
+                true, // Tooltips
+                false // URLs
+        );
+
+        return lineChart;
+    }
+
+    private static JFreeChart createBarChart() {
+        DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+
+        // Fetch sales and restocking data from the database
+        String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
+        String user = "root";
+        String password = "";
+
+        String sql = "SELECT transaction_type, SUM(quantity) AS total_quantity FROM transactions GROUP BY transaction_type";
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                String transactionType = resultSet.getString("transaction_type");
+                int totalQuantity = resultSet.getInt("total_quantity");
+                dataset.addValue(totalQuantity, "Quantity", transactionType);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create the bar chart
+        JFreeChart barChart = ChartFactory.createBarChart(
+                "Sales and Restocking Overview", // Chart title
+                "Transaction Type", // Category axis label
+                "Quantity", // Value axis label
+                dataset, // Data
+                PlotOrientation.VERTICAL, // Orientation
+                true, // Include legend
+                true, // Tooltips
+                false // URLs
+        );
+
+        return barChart;
+    }
 
     private static void styleTable(JTable table) {
         // Set custom header renderer
