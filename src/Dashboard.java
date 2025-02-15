@@ -1,4 +1,3 @@
-
 /*
 icon used:
 https://www.flaticon.com/free-icon/dashboard_9055107?term=dashboard&page=1&position=53&origin=search&related_id=9055107
@@ -8,15 +7,17 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.RoundRectangle2D;
 import java.io.IOException;
+import java.sql.*;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.time.Day;
+import org.jfree.data.time.TimeSeries;
+import org.jfree.data.time.TimeSeriesCollection;
 
-/*
-
-decode("#00bf63")
-
- */
 public class Dashboard {
 
     public static JPanel createTextPanel(String labelText, int size, String color, int style) {
@@ -160,9 +161,6 @@ public class Dashboard {
         JLabel logo1 = Main.createImage(path);
         logo1.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel1.add(logo1);
-//        JPanel pnlNum1 = createNumberPanel(valSystemUsers);
-//        pnlNum1.setBounds(94, 5, 100, 50);
-//        panel1.add(pnlNum1);
         JPanel pnlLabel1 = createScaleTextPanel("ABOUT");
         pnlLabel1.setBounds(85, 39, 100, 20);
         panel1.add(pnlLabel1);
@@ -182,9 +180,6 @@ public class Dashboard {
         JLabel logo2 = Main.createImage(path);
         logo2.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel2.add(logo2);
-//        JPanel pnlNum2 = createNumberPanel(valProducts);
-//        pnlNum2.setBounds(94, 5, 100, 50);
-//        panel2.add(pnlNum2);
         JPanel pnlLabel2 = createScaleTextPanel("PRODUCTS");
         pnlLabel2.setBounds(85, 39, 100, 20);
         panel2.add(pnlLabel2);
@@ -204,9 +199,6 @@ public class Dashboard {
         JLabel logo3 = Main.createImage(path);
         logo3.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel3.add(logo3);
-//        JPanel pnlNum3 = createNumberPanel(valSuppliers);
-//        pnlNum3.setBounds(94, 5, 100, 50);
-//        panel3.add(pnlNum3);
         JPanel pnlLabel3 = createScaleTextPanel("SUPPLIERS");
         pnlLabel3.setBounds(85, 39, 100, 20);
         panel3.add(pnlLabel3);
@@ -226,9 +218,6 @@ public class Dashboard {
         JLabel logo4 = Main.createImage(path);
         logo4.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel4.add(logo4);
-//        JPanel pnlNum4 = createNumberPanel(valTotalSales);
-//        pnlNum4.setBounds(94, 5, 100, 50);
-//        panel4.add(pnlNum4);
         JPanel pnlLabel4 = createScaleTextPanel("TOTAL SALES");
         pnlLabel4.setBounds(85, 39, 100, 20);
         panel4.add(pnlLabel4);
@@ -248,9 +237,6 @@ public class Dashboard {
         JLabel logo5 = Main.createImage(path);
         logo5.setBounds(20, 20, Main.getImageWidth(path), Main.getImageHeight(path));
         panel5.add(logo5);
-//        JPanel pnlNum5 = createNumberPanel(valStocks);
-//        pnlNum5.setBounds(94, 5, 100, 50);
-//        panel5.add(pnlNum5);
         JPanel pnlLabel5 = createScaleTextPanel("STOCKS");
         pnlLabel5.setBounds(85, 39, 100, 20);
         panel5.add(pnlLabel5);
@@ -264,6 +250,131 @@ public class Dashboard {
         });
         pnlDashboard.add(panel5);
 
+        // Add Sales Overview Chart
+        JFreeChart salesChart = createSalesOverviewChart();
+        ChartPanel salesChartPanel = new ChartPanel(salesChart);
+        salesChartPanel.setBounds(60, 150, 600, 300); // Adjust position and size
+        pnlDashboard.add(salesChartPanel);
+
+        // Add Stock Level Indicators
+        JPanel stockPanel = new JPanel();
+        stockPanel.setLayout(new BoxLayout(stockPanel, BoxLayout.Y_AXIS));
+        stockPanel.setBounds(700, 150, 300, 300); // Adjust position and size
+
+        // Example products (replace with data from your database)
+        stockPanel.add(createStockLevelIndicator("Smartphone", 12, 50));
+        stockPanel.add(createStockLevelIndicator("Laptop", 30, 100));
+        stockPanel.add(createStockLevelIndicator("Sofa", 15, 20));
+
+        pnlDashboard.add(stockPanel);
+
+        // Add Recent Transactions Table
+        JTable recentTransactionsTable = createRecentTransactionsTable();
+        JScrollPane scrollPane = new JScrollPane(recentTransactionsTable);
+        scrollPane.setBounds(60, 470, 600, 200); // Adjust position and size
+        pnlDashboard.add(scrollPane);
+
         return pnlDashboard;
     }
+
+    // New Features
+    private static JFreeChart createSalesOverviewChart() {
+        TimeSeriesCollection dataset = new TimeSeriesCollection();
+
+        // Fetch sales data over time
+        String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
+        String user = "root";
+        String password = "";
+
+        String sql = "SELECT DATE(transaction_date) AS transaction_date, SUM(quantity) AS total_quantity "
+                + "FROM transactions "
+                + "WHERE transaction_type = 'Sale' "
+                + "GROUP BY DATE(transaction_date) "
+                + "ORDER BY transaction_date";
+
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            TimeSeries salesSeries = new TimeSeries("Sales");
+
+            while (resultSet.next()) {
+                java.sql.Date transactionDate = resultSet.getDate("transaction_date");
+                int totalQuantity = resultSet.getInt("total_quantity");
+
+                Day day = new Day(transactionDate);
+                salesSeries.addOrUpdate(day, totalQuantity); // Use addOrUpdate() to handle duplicates
+            }
+
+            dataset.addSeries(salesSeries);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        // Create the line chart
+        JFreeChart lineChart = ChartFactory.createTimeSeriesChart(
+                "Sales Overview", // Chart title
+                "Date", // X-axis label
+                "Quantity Sold", // Y-axis label
+                dataset, // Data
+                true, // Include legend
+                true, // Tooltips
+                false // URLs
+        );
+
+        return lineChart;
+    }
+
+    private static JPanel createStockLevelIndicator(String productName, int stockLevel, int maxStock) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(Color.white);
+
+        // Product name label
+        JLabel nameLabel = new JLabel(productName);
+        nameLabel.setFont(new Font("Arial", Font.BOLD, 14));
+        panel.add(nameLabel, BorderLayout.NORTH);
+
+        // Progress bar for stock level
+        JProgressBar progressBar = new JProgressBar(0, maxStock);
+        progressBar.setValue(stockLevel);
+        progressBar.setStringPainted(true); // Show percentage
+        progressBar.setForeground(stockLevel <= maxStock * 0.2 ? Color.RED : Color.GREEN); // Red if stock is low
+        panel.add(progressBar, BorderLayout.CENTER);
+
+        return panel;
+    }
+
+    private static JTable createRecentTransactionsTable() {
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(new Object[]{"Product", "Type", "Quantity", "Date"});
+
+        // Fetch recent transactions
+        String url = "jdbc:mysql://localhost:3306/imsadmin_imsfd";
+        String user = "root";
+        String password = "";
+
+        String sql = "SELECT products.name, transactions.transaction_type, transactions.quantity, transactions.transaction_date "
+                + "FROM transactions "
+                + "JOIN products ON transactions.product_id = products.product_id "
+                + "ORDER BY transactions.transaction_date DESC "
+                + "LIMIT 10"; // Last 10 transactions
+
+        try (Connection connection = DriverManager.getConnection(url, user, password); Statement statement = connection.createStatement(); ResultSet resultSet = statement.executeQuery(sql)) {
+
+            while (resultSet.next()) {
+                String productName = resultSet.getString("name");
+                String transactionType = resultSet.getString("transaction_type");
+                int quantity = resultSet.getInt("quantity");
+                String transactionDate = resultSet.getTimestamp("transaction_date").toString();
+
+                model.addRow(new Object[]{productName, transactionType, quantity, transactionDate});
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        JTable table = new JTable(model);
+        table.setFont(new Font("Arial", Font.PLAIN, 14));
+        table.setRowHeight(30);
+        return table;
+    }
+
 }
